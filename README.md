@@ -107,3 +107,7 @@ Não foi instalado um banco no Sites, nem houve troca por SQLite. A versão publ
 - `supabase/seed.sql`: catálogo exclusivo de desenvolvimento.
 
 Referências: [Supabase Auth](https://supabase.com/docs/guides/auth), [RLS](https://supabase.com/docs/guides/database/postgres/row-level-security), [migrations](https://supabase.com/docs/guides/local-development/database-migrations).
+
+## Fase 3: banco de questões
+
+Acervo editorial com importação JSON validada, taxonomia e identificação de conteúdo sintético. Veja [instalação e roteiro de revisão](docs/phase-3-review.md) e [decisões de arquitetura](docs/phase-3-architecture.md). Nenhum fluxo de prática foi implementado.

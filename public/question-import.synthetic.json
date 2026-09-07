@@ -1,0 +1,81 @@
+[
+  {
+    "id": "30000000-0000-4000-8000-000000000001",
+    "exam": "fuvest",
+    "year": 2026,
+    "phase": "1",
+    "subject": {
+      "key": "matematica",
+      "name": "Matemática"
+    },
+    "topic": {
+      "key": "geometria-plana",
+      "name": "Geometria plana"
+    },
+    "subtopic": {
+      "key": "areas",
+      "name": "Áreas"
+    },
+    "difficulty": "easy",
+    "type": "multiple_choice",
+    "kind": "synthetic",
+    "statement": "Exercício sintético: um retângulo tem lados de 3 cm e 4 cm. Qual é sua área?",
+    "alternatives": {
+      "A": "7 cm²",
+      "B": "12 cm²",
+      "C": "14 cm²",
+      "D": "24 cm²",
+      "E": "25 cm²"
+    },
+    "correct_answer": "B",
+    "explanation": "A área de um retângulo é base × altura: 4 × 3 = 12 cm².",
+    "source": {
+      "title": "BrasilPrep: exercício autoral de desenvolvimento, não aplicado pela FUVEST",
+      "url": null,
+      "permission": "Conteúdo sintético criado para desenvolvimento do BrasilPrep."
+    },
+    "images": [
+      {
+        "url": "/question-media/retangulo.svg",
+        "alt": "Retângulo com base de 4 cm e altura de 3 cm."
+      }
+    ]
+  },
+  {
+    "id": "30000000-0000-4000-8000-000000000002",
+    "exam": "fuvest",
+    "year": 2026,
+    "phase": "1",
+    "subject": {
+      "key": "matematica",
+      "name": "Matemática"
+    },
+    "topic": {
+      "key": "geometria-plana",
+      "name": "Geometria plana"
+    },
+    "subtopic": {
+      "key": "areas",
+      "name": "Áreas"
+    },
+    "difficulty": "easy",
+    "type": "multiple_choice",
+    "kind": "synthetic",
+    "statement": "Exercício sintético: um quadrado tem lado de 5 cm. Qual é sua área?",
+    "alternatives": {
+      "A": "10 cm²",
+      "B": "15 cm²",
+      "C": "20 cm²",
+      "D": "25 cm²",
+      "E": "30 cm²"
+    },
+    "correct_answer": "D",
+    "explanation": "A área do quadrado é lado × lado: 5 × 5 = 25 cm².",
+    "source": {
+      "title": "BrasilPrep: exercício autoral de desenvolvimento, não aplicado pela FUVEST",
+      "url": null,
+      "permission": "Conteúdo sintético criado para desenvolvimento do BrasilPrep."
+    },
+    "images": []
+  }
+]
