@@ -1196,3 +1196,66 @@ tr:last-child td {
     transition: none !important;
   }
 }
+.auth-layout {
+  min-height: 100vh;
+  max-width: 520px;
+  margin: auto;
+  padding: 64px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 32px;
+}
+.auth-layout > .brand {
+  padding: 0;
+}
+.auth-card {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.auth-card h1 {
+  font-size: 1.8rem;
+}
+.auth-links {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  font-size: 0.875rem;
+  color: var(--accent);
+}
+.notice {
+  padding: 16px 20px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--surface);
+  font-size: 0.875rem;
+}
+.notice.error {
+  border-left: 3px solid #b84c4c;
+}
+.notice p {
+  margin: 8px 0;
+}
+.form-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.wide-field {
+  grid-column: 1/-1;
+}
+.signout {
+  margin-top: 20px;
+  border: 0;
+}
+.track-card .button {
+  white-space: normal;
+}
+.track-card .field-grid {
+  grid-template-columns: 1fr;
+}
+.topbar .track-selector select {
+  max-width: 150px;
+}

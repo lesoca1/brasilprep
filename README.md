@@ -1,19 +1,79 @@
 # BrasilPrep
 
-Fundação de uma plataforma de preparação analítica para vestibulares, em português. Fase 1: interface navegável, temas claro e escuro, dados sintéticos e arquitetura inicial.
+Plataforma de preparação analítica para vestibulares. A Fase 2 implementa autenticação por e-mail e senha, perfis, catálogo de ingresso e trilhas persistidas em PostgreSQL via Supabase. Não há prática, pontuação ou analytics nesta fase.
 
-## Executar
+## Começar no Windows ou em outro sistema
 
-Requer Node.js 22 ou superior e npm.
+Requer Node.js 22 ou superior.
 
 ```bash
 npm ci
+```
+
+Escolha uma das configurações abaixo. Sem conexão configurada, a aplicação mostra um estado explícito de indisponibilidade, sem usar contas fictícias.
+
+### Opção A: projeto Supabase de desenvolvimento
+
+1. Crie ou selecione um projeto **de desenvolvimento** no Supabase.
+2. Autentique o CLI e associe o projeto:
+
+```bash
+npx supabase login
+npx supabase link --project-ref SEU_PROJECT_REF
+npx supabase db push
+```
+
+`db push` aplica e registra as migrations. Não execute `db reset --linked` em um projeto com dados.
+
+3. Aplique `supabase/seed.sql` pelo SQL Editor **somente no projeto de desenvolvimento**. O seed é separado da migration e não é carregado automaticamente no ambiente remoto. Todos os itens são marcados `is_development = true`; não há usuários, senhas ou notas de corte inventadas.
+4. Em Authentication, habilite e-mail/senha, confirmação de e-mail e senha mínima de 12 caracteres. Configure a Site URL como `http://localhost:4173` e as URLs permitidas como `http://localhost:4173/confirmar/` e `http://localhost:4173/nova-senha/`. Para produção, use os endereços HTTPS reais e configure o envio de e-mail do projeto.
+5. Copie `.env.example` para `.env.local`. Preencha a URL do projeto e a chave **publishable** pública:
+
+```dotenv
+NEXT_PUBLIC_SUPABASE_URL=https://SEU_PROJECT_REF.supabase.co
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=SUA_CHAVE_PUBLICA
+```
+
+Nunca use uma chave secret ou service_role nessas variáveis. Não envie senhas ou credenciais administrativas pelo chat. `.env.local` não entra no Git.
+
+### Opção B: Supabase local
+
+Requer Docker Desktop ou runtime compatível em execução.
+
+```bash
+npx supabase start
+```
+
+A configuração e as migrations já estão em `supabase/`. O CLI fornece a URL e a chave pública local para `.env.local`. Use o endereço da caixa de e-mail local informado pelo CLI para confirmar o cadastro; a configuração reserva a porta 54324.
+
+Para reconstruir **um banco local descartável**, apagando os dados locais:
+
+```bash
+npx supabase db reset
+```
+
+Esse comando reaplica migrations e seed. Não é necessário executá-lo a cada inicialização.
+
+### Abrir a aplicação
+
+```bash
 npm run dev
 ```
 
-Abra http://localhost:4173/dashboard. Não são necessárias credenciais ou variáveis de ambiente.
+Abra http://localhost:4173/cadastro. Reinicie o servidor após mudar `.env.local`.
 
-## Verificar
+## Fluxo
+
+Criar conta → confirmar e-mail → escolher vestibulares → selecionar instituição/curso/campus/modalidade → revisar objetivos → confirmar trilhas → painel.
+
+- Uma trilha por vestibular por usuário. Múltiplos vestibulares são permitidos.
+- Alterar objetivo mantém a identidade da trilha.
+- Trocar trilha ativa salva a preferência no banco, inclusive entre dispositivos.
+- Remover a trilha ativa seleciona outra trilha da conta. Remover a última retorna ao onboarding.
+- O painel de uma conta nova não mostra métricas fictícias.
+- Tema é uma preferência local do navegador. Dados de perfil e trilhas ficam no PostgreSQL.
+
+## Verificações
 
 ```bash
 npm run lint
@@ -23,30 +83,27 @@ npm run build
 npm test
 ```
 
-Os testes de entrega inspecionam a exportação gerada. Execute `build` antes de `test`. Não há motor analítico nem cálculos de pontuação nesta fase.
+`npm test` inclui testes SQL com PostgreSQL embarcado (PGlite), domínio, contrato de autenticação e exportação. Os testes de exportação exigem `build` antes. `npm run test:db` e `npm run test:unit` podem rodar isoladamente sem Docker, credenciais ou serviço remoto.
 
-## Telas
+Os testes SQL executam a migration real, o seed e as políticas RLS. O contrato `auth.uid()` é simulado apenas no banco de teste. Os testes de autenticação usam respostas HTTP controladas para testar o SDK e tratamento de erros. **Esses testes não substituem validação com Supabase Auth real**, e não testam entrega de e-mail.
 
-| Rota             | Conteúdo                                                                 |
-| ---------------- | ------------------------------------------------------------------------ |
-| `/dashboard`     | Objetivo, indicadores fictícios, tendência e próxima prática ilustrativa |
-| `/trilhas`       | FUVEST e UNICAMP, com troca da trilha em visualização                    |
-| `/praticar`      | Configuração visual de uma sessão, sem iniciar ou salvar respostas       |
-| `/simulados`     | Estrutura inicial e estado vazio de histórico                            |
-| `/desempenho`    | Exemplos por disciplina e estados indisponíveis para comparações         |
-| `/questoes`      | Exercícios sintéticos, busca, filtro e explicações                       |
-| `/configuracoes` | Temas claro e escuro e perfil demonstrativo                              |
+Veja [esquema e relações](docs/phase-2-schema.md), [decisões de arquitetura](docs/phase-2-architecture.md) e [roteiro de demonstração](docs/phase-2-review.md).
 
-A raiz também abre o painel. A trilha selecionada dura enquanto a aplicação permanece aberta; ao recarregar, volta a FUVEST. Apenas o tema usa armazenamento local, quando disponível.
+## Publicação
 
-## Escopo
+Next.js mantém a exportação estática nesta fase. Autenticação e dados são atendidos pelo Supabase; a autorização ocorre no PostgreSQL com RLS e funções transacionais. O HTML inicial contém apenas a tela neutra de carregamento, sem dados pessoais. As variáveis `NEXT_PUBLIC_*` são incorporadas no build; configure-as antes de publicar na Vercel ou gerar outra exportação.
 
-Sem autenticação, banco, migrations, scoring, percentis, recomendações reais ou motor de prática. Valores são fixtures de design e não podem ser usados como dados de produção. Questões sintéticas não reproduzem o nível ou formato oficial das provas.
+Não foi instalado um banco no Sites, nem houve troca por SQLite. A versão publicada da Fase 1 permanece separada da branch da Fase 2 até configurar e validar o serviço real.
 
-Consulte [arquitetura](docs/architecture.md), [definições de dados](docs/data-integrity.md) e [roteiro de revisão](docs/phase-1-review.md).
+## Código
 
-## Hospedagem
+- `src/domain`: tipos e validação de seleção, sem dependência de Supabase.
+- `src/data-access`: contratos e adaptador Supabase.
+- `src/components/layout`: sessão, proteção visual de rotas e trilha ativa.
+- `src/modules/auth`: cadastro, entrada, confirmação e recuperação de senha.
+- `src/modules/onboarding`: seleção em três passos.
+- `src/modules/tracks`: criação, edição, troca e remoção.
+- `supabase/migrations`: alterações versionadas do esquema e autorização.
+- `supabase/seed.sql`: catálogo exclusivo de desenvolvimento.
 
-O projeto usa Next.js App Router, React, TypeScript estrito e Tailwind CSS. A Fase 1 exporta HTML estático em `out/`. Pode ser publicada na Vercel como projeto Next.js. A cópia de revisão no Sites usa o mesmo código e a exportação estática; não adiciona dependências de runtime ao produto. Ao introduzir autenticação e servidor, reavaliar `output: 'export'` em uma fase aprovada.
-
-GitHub é o repositório de desenvolvimento: https://github.com/lesoca1/brasilprep. Revisar a branch `phase-1/foundation` antes de incorporar as mudanças à `main`.
+Referências: [Supabase Auth](https://supabase.com/docs/guides/auth), [RLS](https://supabase.com/docs/guides/database/postgres/row-level-security), [migrations](https://supabase.com/docs/guides/local-development/database-migrations).
