@@ -1,10 +1,10 @@
 # BrasilPrep engineering agreement
 
-Implement only the phase explicitly approved by the user. Phase 1 is the application foundation and visual system. Stop after delivery and wait for approval before adding future phases.
+Implement only the phase explicitly approved by the user. Phase 2 adds Supabase PostgreSQL, authentication and onboarding. Stop after delivery and wait for approval before adding future phases.
 
 - Preserve Next.js App Router, strict TypeScript, React and Tailwind.
 - Keep pages in src/app, reusable UI in src/components, feature screens in src/modules, synthetic fixtures in src/data and shared utilities in src/lib.
-- Keep database access, business rules, scoring and analytics out of UI. They are not implemented in Phase 1.
+- Keep database access, business rules, scoring and analytics out of UI. Scoring and analytics remain out of scope.
 - UI language is pt-BR. Do not use em dashes, gamification, invented official scores or fake benchmarks.
 - All demonstration metrics must remain visibly labeled. Never copy synthetic data into production pathways.
 - Only use provided, synthetic or licensed questions.

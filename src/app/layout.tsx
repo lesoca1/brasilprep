@@ -5,7 +5,7 @@ import './globals.css';
 export const metadata: Metadata = {
   title: { default: 'BrasilPrep', template: '%s | BrasilPrep' },
   description:
-    'Preparação analítica para vestibulares. Demonstração da interface.',
+    'Preparação analítica para vestibulares. Sua conta, seus vestibulares e seus objetivos.',
   robots: { index: false, follow: false },
 };
 const themeScript =
@@ -16,7 +16,10 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" suppressHydrationWarning>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+        <script
+          id="brasilprep-theme-init"
+          dangerouslySetInnerHTML={{ __html: themeScript }}
+        />
       </head>
       <body>
         <Providers>

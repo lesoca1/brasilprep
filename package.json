@@ -13,23 +13,29 @@
     "typecheck": "tsc --noEmit",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "test": "node --test tests/*.test.mjs"
+    "test": "node --import tsx --test tests/*.test.mjs tests/*.test.ts",
+    "test:db": "node --test tests/database.test.mjs",
+    "test:unit": "node --import tsx --test tests/domain.test.ts tests/auth.test.ts"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.115.0",
+    "lucide-react": "^0.468.0",
     "next": "^16.0.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "lucide-react": "^0.468.0"
+    "react-dom": "^19.0.0"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "^0.5.8",
     "@tailwindcss/postcss": "^4.0.0",
-    "tailwindcss": "^4.0.0",
-    "typescript": "^5.9.0",
     "@types/node": "^22.0.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "eslint": "^9.0.0",
     "eslint-config-next": "^16.0.0",
-    "prettier": "^3.0.0"
+    "prettier": "^3.0.0",
+    "supabase": "^2.116.0",
+    "tailwindcss": "^4.0.0",
+    "tsx": "^4.23.13",
+    "typescript": "^5.9.0"
   }
 }
