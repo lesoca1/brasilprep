@@ -43,6 +43,63 @@ function check(error: { message: string; code?: string } | null) {
 }
 export function createServices(client: SupabaseClient<Database>): AppServices {
   return {
+    questions: {
+      async isEditor() {
+        const result = await client
+          .from('question_editors')
+          .select('user_id')
+          .limit(1);
+        if (result.error)
+          throw new Error(
+            'Não foi possível verificar o acesso ao acervo. Verifique se a migration da Fase 3 foi aplicada.',
+          );
+        return Boolean(result.data?.length);
+      },
+      async list(filter) {
+        let query = client.from('questions').select('*', { count: 'exact' });
+        if (filter.exam) query = query.eq('exam_id', filter.exam);
+        if (filter.kind === 'synthetic' || filter.kind === 'official')
+          query = query.eq('kind', filter.kind);
+        if (
+          filter.difficulty === 'easy' ||
+          filter.difficulty === 'medium' ||
+          filter.difficulty === 'hard'
+        )
+          query = query.eq('difficulty', filter.difficulty);
+        const result = await query
+          .order('created_at', { ascending: false })
+          .order('id')
+          .range(filter.page * 20, filter.page * 20 + 19);
+        if (result.error)
+          throw new Error(
+            'Não foi possível carregar o acervo. Tente novamente.',
+          );
+        return { rows: result.data ?? [], count: result.count ?? 0 };
+      },
+      async importBatch(questions) {
+        const result = await client.rpc('import_questions', {
+          batch: questions,
+        });
+        if (result.error) {
+          if (result.error.code === '23505')
+            throw new Error(
+              'Lote rejeitado: enunciado duplicado no mesmo vestibular. Nenhuma questão foi adicionada.',
+            );
+          if (result.error.code === '23503')
+            throw new Error('Lote rejeitado: vestibular não cadastrado.');
+          if (result.error.code === '42501')
+            throw new Error('Acesso de editor necessário.');
+          if (result.error.code === '22023')
+            throw new Error(
+              `Lote rejeitado: ${result.error.message}. Nenhuma alteração foi salva.`,
+            );
+          throw new Error(
+            'Importação não confirmada. Verifique a conexão e reenvie o mesmo arquivo; IDs idênticos não serão duplicados.',
+          );
+        }
+        return result.data ?? 0;
+      },
+    },
     auth: {
       async identity() {
         const { data, error } = await client.auth.getUser();

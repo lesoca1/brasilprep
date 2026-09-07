@@ -1259,3 +1259,73 @@ tr:last-child td {
 .topbar .track-selector select {
   max-width: 150px;
 }
+
+.question-import,
+.question-detail {
+  padding: 1.25rem;
+  display: grid;
+  gap: 1rem;
+}
+.question-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 1.25rem;
+}
+.question-filters label,
+.question-import label {
+  display: grid;
+  gap: 0.5rem;
+  min-width: 0;
+}
+.question-filters select {
+  min-width: 10rem;
+}
+.question-record {
+  border-top: 1px solid var(--border);
+}
+.question-record summary {
+  padding: 1.25rem;
+  cursor: pointer;
+}
+.question-record summary span {
+  display: block;
+  margin-top: 0.35rem;
+  overflow-wrap: anywhere;
+}
+.question-detail {
+  border-top: 1px solid var(--border);
+  overflow-wrap: anywhere;
+}
+.question-detail ol {
+  padding-left: 1.5rem;
+}
+.question-detail li {
+  padding: 0.4rem;
+}
+.question-statement {
+  white-space: pre-wrap;
+}
+.question-image {
+  max-width: 100%;
+  height: auto;
+  max-height: 28rem;
+  object-fit: contain;
+  object-position: left;
+}
+.question-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.25rem;
+}
+.question-import input {
+  max-width: 100%;
+}
+@media (max-width: 600px) {
+  .question-filters {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+}

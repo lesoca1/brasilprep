@@ -1,3 +1,8 @@
+import type {
+  QuestionInput,
+  QuestionRow,
+  QuestionFilter,
+} from '@/domain/questions';
 import type { Identity, Workspace } from '@/domain/models';
 export interface AuthGateway {
   identity(): Promise<Identity | null>;
@@ -21,4 +26,13 @@ export interface WorkspaceRepository {
   removeTrilha(id: string): Promise<void>;
   updateProfile(name: string): Promise<void>;
 }
-export type AppServices = { auth: AuthGateway; workspace: WorkspaceRepository };
+export interface QuestionRepository {
+  isEditor(): Promise<boolean>;
+  list(filter: QuestionFilter): Promise<{ rows: QuestionRow[]; count: number }>;
+  importBatch(questions: QuestionInput[]): Promise<number>;
+}
+export type AppServices = {
+  auth: AuthGateway;
+  workspace: WorkspaceRepository;
+  questions: QuestionRepository;
+};

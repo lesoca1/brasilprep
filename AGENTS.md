@@ -1,6 +1,6 @@
 # BrasilPrep engineering agreement
 
-Implement only the phase explicitly approved by the user. Phase 2 adds Supabase PostgreSQL, authentication and onboarding. Stop after delivery and wait for approval before adding future phases.
+Implement only the phase explicitly approved by the user. Phase 3 adds the editor-only question bank, taxonomy and validated bulk import on top of Phase 2. Stop after delivery and wait for approval before adding future phases.
 
 - Preserve Next.js App Router, strict TypeScript, React and Tailwind.
 - Keep pages in src/app, reusable UI in src/components, feature screens in src/modules, synthetic fixtures in src/data and shared utilities in src/lib.
