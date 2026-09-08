@@ -1,94 +1,70 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
+import localFont from 'next/font/local';
 import {
   ArrowRight,
   ArrowUpRight,
-  Check,
+  ArrowDown,
   Moon,
   Sun,
   Menu,
   X,
+  Mail,
+  SlidersHorizontal,
+  FileCheck2,
+  ChartNoAxesCombined,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTheme } from '@/components/layout/providers';
+import { faqs, contactEmail } from './landing-content';
 import styles from './landing.module.css';
 
+const poppins = localFont({
+  src: [
+    {
+      path: '../../../public/fonts/poppins/Poppins-Regular.ttf',
+      weight: '400',
+      style: 'normal',
+    },
+    {
+      path: '../../../public/fonts/poppins/Poppins-SemiBold.ttf',
+      weight: '600',
+      style: 'normal',
+    },
+    {
+      path: '../../../public/fonts/poppins/Poppins-Bold.ttf',
+      weight: '700',
+      style: 'normal',
+    },
+  ],
+  display: 'swap',
+  variable: '--font-poppins',
+});
 const links = [
-  { href: '#por-que', label: 'Por que BrasilPrep' },
+  { href: '#por-que', label: 'Por que existimos' },
   { href: '#como-funciona', label: 'Como funciona' },
-  { href: '#duvidas', label: 'Dúvidas frequentes' },
+  { href: '#recursos', label: 'Recursos' },
+  { href: '#contato', label: 'Contato' },
 ];
-const steps = [
+const workflow = [
   {
-    number: '01',
-    title: 'Defina seu destino.',
-    text: 'Escolha o vestibular e o curso que você quer alcançar. Sua trilha reúne esse objetivo e organiza o seu estudo.',
+    icon: SlidersHorizontal,
+    title: 'Monte a sessão.',
+    text: 'Escolha sua trilha, os assuntos, a dificuldade, o ano e a quantidade de questões.',
   },
   {
-    number: '02',
-    title: 'Pratique com intenção.',
-    text: 'Filtre por disciplina, assunto, dificuldade e ano. Estude com correção imediata ou teste seus conhecimentos com o resultado ao final.',
+    icon: FileCheck2,
+    title: 'Resolva e confira.',
+    text: 'Responda no navegador. A correção é automática, com explicações na hora ou ao final da sessão.',
   },
   {
-    number: '03',
-    title: 'Entenda seu resultado.',
-    text: 'Revise respostas e explicações. Veja acertos, questões em branco e tempo por questão, sempre com o tamanho da amostra.',
-  },
-  {
-    number: '04',
-    title: 'Ajuste o próximo passo.',
-    text: 'Consulte o histórico por assunto, identifique onde errou e escolha o que revisar na próxima sessão.',
+    icon: ChartNoAxesCombined,
+    title: 'Saiba o que revisar.',
+    text: 'Consulte acertos, tempo e histórico por assunto. Use os resultados para escolher sua próxima prática.',
   },
 ];
-const faqs = [
-  {
-    question: 'O que é o BrasilPrep?',
-    answer:
-      'É uma plataforma para organizar sua preparação para vestibulares, resolver questões e acompanhar seu desempenho. Ela reúne objetivos, prática e histórico em um só lugar.',
-  },
-  {
-    question: 'O BrasilPrep substitui o cursinho ou as aulas?',
-    answer:
-      'Não. Ele complementa seus materiais e suas aulas. A proposta é ajudar você a praticar o conteúdo e entender os resultados desse estudo.',
-  },
-  {
-    question: 'O que é uma trilha? Posso ter mais de uma?',
-    answer:
-      'Uma trilha conecta um vestibular ao seu objetivo de instituição e curso. Você pode manter uma trilha por vestibular, alternar entre elas e editar ou remover seus objetivos.',
-  },
-  {
-    question: 'Quais vestibulares e questões estão disponíveis?',
-    answer:
-      'As opções disponíveis aparecem no cadastro e nos filtros da prática. A versão atual está em desenvolvimento e inclui conteúdo sintético identificado para testar o funcionamento. Isso não significa que já exista um acervo oficial completo para cada vestibular.',
-  },
-  {
-    question: 'Qual é a diferença entre Estudo e Teste?',
-    answer:
-      'No modo Estudo, a correção e a explicação aparecem após confirmar cada resposta. No modo Teste, você recebe o feedback depois de finalizar a sessão.',
-  },
-  {
-    question: 'Como o desempenho é calculado?',
-    answer:
-      'O percentual de acerto divide as respostas corretas pelo total de questões das sessões finalizadas, incluindo as que ficaram em branco. Os relatórios mostram a amostra e permitem separar modos e origem das questões. Acerto na prática não equivale à nota oficial do vestibular.',
-  },
-  {
-    question: 'O BrasilPrep garante aprovação ou prevê minha nota?',
-    answer:
-      'Não. Os resultados ajudam a acompanhar a prática, mas não garantem aprovação nem estimam uma nota oficial. Uma amostra pequena também não basta para concluir que você domina um assunto.',
-  },
-  {
-    question: 'Se eu atualizar a página, perco minha sessão?',
-    answer:
-      'As sessões ativas e as respostas confirmadas são salvas para você retomar. Se a conexão cair, observe o status de gravação e espere a sincronização antes de encerrar ou trocar de dispositivo.',
-  },
-  {
-    question: 'Preciso instalar um aplicativo?',
-    answer:
-      'Não. O acesso acontece pelo navegador, no computador, tablet ou celular. Você precisa de conexão com a internet para entrar na conta e sincronizar sua prática.',
-  },
-];
-
 function Brand() {
   return (
     <span className={styles.wordmark}>
@@ -97,12 +73,53 @@ function Brand() {
     </span>
   );
 }
-
 export function LandingPage() {
   const { theme, setTheme } = useTheme();
   const [menuOpen, setMenuOpen] = useState(false);
+  const pageRef = useRef<HTMLDivElement>(null);
+  const menuRef = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    const root = pageRef.current;
+    if (!root || !('IntersectionObserver' in window)) return;
+    const preference = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const elements = [...root.querySelectorAll<HTMLElement>('[data-reveal]')];
+    const clear = () =>
+      elements.forEach((element) => {
+        element.dataset.reveal = 'visible';
+      });
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            (entry.target as HTMLElement).dataset.reveal = 'visible';
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.08 },
+    );
+    if (!preference.matches)
+      elements.forEach((element) => {
+        if (element.getBoundingClientRect().top > window.innerHeight) {
+          element.dataset.reveal = 'pending';
+          observer.observe(element);
+        }
+      });
+    const onPreference = () => {
+      if (preference.matches) {
+        clear();
+        observer.disconnect();
+      }
+    };
+    preference.addEventListener('change', onPreference);
+    return () => {
+      observer.disconnect();
+      preference.removeEventListener('change', onPreference);
+      clear();
+    };
+  }, []);
   return (
-    <div className={styles.landing}>
+    <div className={`${styles.landing} ${poppins.variable}`} ref={pageRef}>
       <a className="skip-link" href="#landing-content">
         Pular para o conteúdo
       </a>
@@ -137,6 +154,7 @@ export function LandingPage() {
               {theme === 'dark' ? <Sun size={19} /> : <Moon size={19} />}
             </button>
             <button
+              ref={menuRef}
               className={`${styles.iconButton} ${styles.menuButton}`}
               aria-label={menuOpen ? 'Fechar menu' : 'Abrir menu'}
               aria-expanded={menuOpen}
@@ -153,7 +171,10 @@ export function LandingPage() {
             className={styles.mobileNav}
             aria-label="Navegação móvel"
             onKeyDown={(event) => {
-              if (event.key === 'Escape') setMenuOpen(false);
+              if (event.key === 'Escape') {
+                setMenuOpen(false);
+                menuRef.current?.focus();
+              }
             }}
           >
             {links.map((link) => (
@@ -170,284 +191,288 @@ export function LandingPage() {
           </nav>
         )}
       </header>
-
       <main id="landing-content" className={styles.main} tabIndex={-1}>
         <section className={styles.hero} aria-labelledby="hero-title">
-          <div className={`${styles.container} ${styles.heroContent}`}>
-            <p className={styles.heroEyebrow}>PREPARAÇÃO PARA VESTIBULARES</p>
-            <h1 id="hero-title">
-              Aprovar <strong>não</strong> é sorte.
-              <br />
-              <span className={styles.highlight}>É sistema.</span>
-            </h1>
-            <p className={styles.heroDescription}>
-              Seu objetivo dá a direção.
-              <br />
-              Sua prática mostra o próximo passo.
-            </p>
-            <div className={styles.heroActions}>
-              <Link href="/cadastro" className={styles.primaryButton}>
-                Começar minha preparação{' '}
-                <ArrowRight size={19} aria-hidden="true" />
-              </Link>
-              <a href="#como-funciona" className={styles.heroSecondary}>
-                Conhecer o método
+          <div className={`${styles.container} ${styles.heroGrid}`}>
+            <div className={styles.heroCopy}>
+              <a href="#em-construcao" className={styles.statusLink}>
+                Em construção <ArrowUpRight size={14} aria-hidden="true" />
               </a>
+              <h1 id="hero-title">
+                Aprovar <strong>não</strong>
+                <br />é sorte.
+                <br />
+                <span className={styles.highlight}>É sistema.</span>
+              </h1>
+              <p className={styles.heroDescription}>
+                Questões, correção e análise de desempenho no mesmo lugar. Sem
+                imprimir listas nem montar planilhas.
+              </p>
+              <div className={styles.heroActions}>
+                <Link href="/cadastro" className={styles.primaryButton}>
+                  Conhecer a plataforma{' '}
+                  <ArrowRight size={19} aria-hidden="true" />
+                </Link>
+                <a href="#como-funciona" className={styles.heroSecondary}>
+                  Como funciona <ArrowDown size={16} aria-hidden="true" />
+                </a>
+              </div>
             </div>
-            <div className={styles.heroFoot}>
-              <span>Objetivo claro. Prática constante. Evolução visível.</span>
-              <span>BRASILPREP / SEU ESPAÇO DE ESTUDO</span>
-            </div>
+            <figure className={styles.heroIllustration}>
+              <Image
+                src="/landing/platform-illustration.png"
+                alt="Ilustração de uma questão de múltipla escolha, uma lista de assuntos e painéis de desempenho."
+                width={1200}
+                height={1000}
+                priority
+              />
+              <figcaption>Ilustração dos recursos da plataforma</figcaption>
+            </figure>
           </div>
         </section>
-
         <section
           id="por-que"
-          className={`${styles.container} ${styles.section}`}
+          className={`${styles.container} ${styles.section} ${styles.whyGrid}`}
           aria-labelledby="why-title"
         >
-          <div className={styles.sectionHeading}>
-            <p className={styles.eyebrow}>01 / POR QUE BRASILPREP</p>
+          <div data-reveal>
+            <p className={styles.eyebrow}>POR QUE EXISTIMOS</p>
             <h2 id="why-title">
-              Estudar é importante.
+              O estudo não acaba
               <br />
-              <span>Saber o que revisar também.</span>
+              quando você termina
+              <br />
+              <span>a última questão.</span>
             </h2>
           </div>
-          <div className={styles.whyGrid}>
-            <p className={styles.intro}>
-              Entre aulas, listas e simulados, é fácil perder de vista o que
-              você já aprendeu e o que ainda precisa de atenção. O BrasilPrep
-              reúne essa informação para você tomar a próxima decisão com mais
-              clareza.
+          <div className={styles.whyCopy} data-reveal>
+            <p>
+              Há décadas, a preparação para o vestibular exige mais do que
+              estudar: baixar provas, imprimir listas, comparar respostas com o
+              gabarito e anotar os resultados.
             </p>
-            <div className={styles.benefits}>
-              <article>
-                <span>01</span>
-                <div>
-                  <h3>Um objetivo, não uma lista sem fim.</h3>
-                  <p>
-                    Organize a preparação em torno do vestibular e do curso que
-                    você quer alcançar.
-                  </p>
-                </div>
-              </article>
-              <article>
-                <span>02</span>
-                <div>
-                  <h3>Seus erros têm algo a ensinar.</h3>
-                  <p>
-                    Revise a explicação de cada questão e acompanhe os assuntos
-                    que merecem outra tentativa.
-                  </p>
-                </div>
-              </article>
-              <article>
-                <span>03</span>
-                <div>
-                  <h3>Resultados com contexto.</h3>
-                  <p>
-                    Veja acertos junto do número de questões. Uma resposta certa
-                    não conta a história inteira.
-                  </p>
-                </div>
-              </article>
-            </div>
+            <p>
+              O BrasilPrep reúne essas etapas em uma plataforma. Você resolve as
+              questões; o sistema corrige, guarda suas respostas e organiza os
+              resultados por assunto.
+            </p>
+            <p className={styles.whyConclusion}>
+              O tempo que iria para a correção manual pode ir para a revisão do
+              que você ainda não entendeu.
+            </p>
           </div>
         </section>
-
         <section
           id="como-funciona"
           className={styles.methodSection}
           aria-labelledby="method-title"
         >
           <div className={`${styles.container} ${styles.section}`}>
-            <div className={styles.sectionHeading}>
-              <p className={styles.eyebrow}>02 / COMO FUNCIONA</p>
-              <h2 id="method-title">Do objetivo à próxima revisão.</h2>
-              <p className={styles.sectionDescription}>
-                Um ciclo simples, que acompanha o seu estudo.
-              </p>
+            <div className={styles.sectionHeading} data-reveal>
+              <p className={styles.eyebrow}>COMO FUNCIONA</p>
+              <h2 id="method-title">
+                Da lista de questões
+                <br />à revisão. Sem sair daqui.
+              </h2>
             </div>
-            <div className={styles.steps}>
-              {steps.map((step) => (
-                <article key={step.number}>
-                  <span className={styles.stepNumber}>{step.number}</span>
-                  <h3>{step.title}</h3>
-                  <p>{step.text}</p>
+            <div className={styles.workflow}>
+              {workflow.map(({ icon: Icon, title, text }, index) => (
+                <article key={title} data-reveal>
+                  <div className={styles.workflowTop}>
+                    <Icon size={28} strokeWidth={1.3} aria-hidden="true" />
+                    <span>0{index + 1}</span>
+                  </div>
+                  <h3>{title}</h3>
+                  <p>{text}</p>
                 </article>
               ))}
             </div>
-            <div className={styles.modes}>
+            <div className={styles.modeStrip} data-reveal>
               <div>
-                <p className={styles.eyebrow}>DUAS FORMAS DE PRATICAR</p>
-                <h3>
-                  Aprender agora.
-                  <br />
-                  Ou testar antes de conferir.
-                </h3>
+                <span>Estudo</span>
+                <p>Correção e explicação após cada resposta.</p>
               </div>
-              <article>
-                <span className={styles.modeLabel}>ESTUDO</span>
-                <h4>Entenda cada resposta.</h4>
-                <p>
-                  Confirme a alternativa e consulte a correção na hora. Uma
-                  forma de estudar com a explicação ainda próxima do raciocínio.
-                </p>
-              </article>
-              <article>
-                <span className={styles.modeLabel}>TESTE</span>
-                <h4>Concentre-se na resolução.</h4>
-                <p>
-                  Responda no seu ritmo e revise o conjunto ao final. O gabarito
-                  só aparece depois de encerrar a sessão.
-                </p>
-              </article>
+              <div>
+                <span>Teste</span>
+                <p>Gabarito e resultado depois de finalizar.</p>
+              </div>
+              <div>
+                <span>Sessões salvas</span>
+                <p>Retome de onde parou, pela sua conta.</p>
+              </div>
             </div>
           </div>
         </section>
-
         <section
-          className={`${styles.container} ${styles.section} ${styles.insightSection}`}
-          aria-labelledby="insight-title"
+          id="recursos"
+          className={`${styles.container} ${styles.section}`}
+          aria-labelledby="features-title"
         >
-          <div className={styles.insightCopy}>
-            <p className={styles.eyebrow}>03 / O QUE VOCÊ ACOMPANHA</p>
-            <h2 id="insight-title">
-              Menos impressão.
-              <br />
-              <span>Mais informação.</span>
-            </h2>
-            <p>
-              O histórico transforma suas respostas em uma visão do que
-              aconteceu na prática. Você escolhe o recorte e decide o que fazer
-              a seguir.
-            </p>
-            <ul className={styles.checklist}>
-              <li>
-                <Check size={17} aria-hidden="true" />
-                Acerto por disciplina, assunto e dificuldade
-              </li>
-              <li>
-                <Check size={17} aria-hidden="true" />
-                Questões respondidas e tempo médio
-              </li>
-              <li>
-                <Check size={17} aria-hidden="true" />
-                Histórico e desempenho recente
-              </li>
-              <li>
-                <Check size={17} aria-hidden="true" />
-                Tamanho da amostra sempre à vista
-              </li>
-            </ul>
-            <a href="#duvidas" className={styles.textLink}>
-              Entenda os indicadores <ArrowRight size={17} aria-hidden="true" />
-            </a>
-          </div>
-          <figure className={styles.report}>
-            <figcaption>
-              <strong>Uma sessão, em perspectiva.</strong>
-              <span>Exemplo ilustrativo · dados fictícios</span>
-            </figcaption>
-            <div className={styles.reportContext}>
-              <span>FUVEST / MODO TESTE</span>
-              <span>Questões sintéticas</span>
-            </div>
-            <div className={styles.reportMetrics}>
-              <div>
-                <span>Acerto na sessão</span>
-                <strong>
-                  51,4<span>%</span>
-                </strong>
-                <p>18 corretas de 35 questões</p>
-              </div>
-              <div>
-                <span>Questões respondidas</span>
-                <strong>
-                  35<span>/35</span>
-                </strong>
-                <p>0 questões em branco</p>
-              </div>
-            </div>
-            <div className={styles.reportRows}>
-              <div>
-                <span>Matemática</span>
-                <span>12 / 20</span>
-                <strong>60%</strong>
-                <div className={styles.bar}>
-                  <span style={{ width: '60%' }} />
-                </div>
-              </div>
-              <div>
-                <span>Física</span>
-                <span>6 / 15</span>
-                <strong>40%</strong>
-                <div className={styles.bar}>
-                  <span style={{ width: '40%' }} />
-                </div>
-              </div>
-            </div>
-            <p className={styles.sampleNote}>
-              15 questões de Física ainda são uma amostra pequena. Use o
-              resultado como ponto de partida para revisar.
-            </p>
-            <p className={styles.reportNote}>
-              Percentual de acerto não é nota oficial do vestibular.
-            </p>
-          </figure>
-        </section>
-
-        <section
-          id="onde-estudar"
-          className={styles.accessSection}
-          aria-labelledby="access-title"
-        >
-          <div className={`${styles.container} ${styles.accessGrid}`}>
+          <div className={styles.featureHeading} data-reveal>
             <div>
-              <p className={styles.eyebrow}>04 / ONDE ESTUDAR</p>
-              <h2 id="access-title">
-                Seu estudo.
+              <p className={styles.eyebrow}>RECURSOS</p>
+              <h2 id="features-title">
+                Uma infraestrutura digital
                 <br />
-                No seu navegador.
+                para o vestibulando.
+              </h2>
+            </div>
+            <p>
+              Organização por vestibular, questões classificadas e um histórico
+              que acompanha sua preparação.
+            </p>
+          </div>
+          <div className={styles.featureGrid}>
+            <article className={styles.taxonomyFeature} data-reveal>
+              <div className={styles.featureText}>
+                <span className={styles.featureIndex}>01</span>
+                <h3>Da matéria ao subtema.</h3>
+                <p>
+                  Filtre o que quer praticar e localize os erros com o mesmo
+                  nível de detalhe.
+                </p>
+              </div>
+              <div
+                className={styles.taxonomy}
+                aria-label="Exemplo de classificação: Matemática, Geometria plana, Áreas"
+              >
+                <span>Matemática</span>
+                <span>Geometria plana</span>
+                <span>Áreas</span>
+              </div>
+              <p className={styles.featureMeta}>
+                3 níveis: disciplina, assunto e subassunto.
+              </p>
+            </article>
+            <article className={styles.analyticsFeature} data-reveal>
+              <div className={styles.featureText}>
+                <span className={styles.featureIndex}>02</span>
+                <h3>Desempenho por assunto.</h3>
+                <p>
+                  Acertos e tempo de resolução, com tamanho da amostra e
+                  histórico.
+                </p>
+              </div>
+              <figure className={styles.miniReport}>
+                <figcaption>Exemplo ilustrativo · dados fictícios</figcaption>
+                <div>
+                  <span>Matemática</span>
+                  <span>12/20</span>
+                  <strong>60%</strong>
+                  <div className={styles.bar}>
+                    <span style={{ width: '60%' }} />
+                  </div>
+                </div>
+                <div>
+                  <span>Física</span>
+                  <span>6/15</span>
+                  <strong>40%</strong>
+                  <div className={styles.bar}>
+                    <span style={{ width: '40%' }} />
+                  </div>
+                </div>
+              </figure>
+              <p className={styles.featureMeta}>
+                Acerto na prática não equivale à nota oficial.
+              </p>
+            </article>
+            <article className={styles.examFeature} data-reveal>
+              <div className={styles.featureText}>
+                <span className={styles.featureIndex}>03</span>
+                <h3>Mais de um vestibular.</h3>
+                <p>
+                  Crie uma trilha por exame e alterne entre seus objetivos de
+                  instituição e curso.
+                </p>
+              </div>
+              <div className={styles.examNames}>
+                <span>FUVEST</span>
+                <span>UNICAMP</span>
+                <span>UNESP</span>
+                <span>FGV</span>
+                <span>Insper</span>
+                <span>ITA</span>
+                <span>IME</span>
+                <span>ENEM</span>
+              </div>
+              <p className={styles.featureMeta}>
+                Opções no catálogo de desenvolvimento. A cobertura de questões
+                ainda está em preparação.
+              </p>
+            </article>
+            <article className={styles.bankFeature} data-reveal>
+              <div className={styles.featureText}>
+                <span className={styles.featureIndex}>04</span>
+                <h3>Um acervo organizado.</h3>
+                <p>
+                  Questões com ano, fase, dificuldade, fonte e explicação.
+                  Bancas, matérias e subtemas em uma estrutura comum.
+                </p>
+              </div>
+              <dl className={styles.coverage}>
+                <div>
+                  <dt>Bancas e provas</dt>
+                  <dd>Em catalogação</dd>
+                </div>
+                <div>
+                  <dt>Questões oficiais</dt>
+                  <dd>Acervo em preparação</dd>
+                </div>
+                <div>
+                  <dt>Matérias e subtemas</dt>
+                  <dd>Classificação em curso</dd>
+                </div>
+              </dl>
+              <p className={styles.featureMeta}>
+                Os totais serão divulgados após a revisão do acervo.
+              </p>
+            </article>
+          </div>
+        </section>
+        <section
+          id="em-construcao"
+          className={styles.buildSection}
+          aria-labelledby="build-title"
+        >
+          <div
+            className={`${styles.container} ${styles.buildGrid}`}
+            data-reveal
+          >
+            <div>
+              <p className={styles.eyebrow}>ESTADO DO PROJETO</p>
+              <h2 id="build-title">
+                Estamos construindo
+                <br />o BrasilPrep.
               </h2>
             </div>
             <div>
-              <p className={styles.accessLead}>
-                Na mesa de estudo ou no intervalo entre aulas.
+              <p>
+                Cadastro, trilhas, prática e análise de desempenho já fazem
+                parte da plataforma. O acervo está em preparação e os exercícios
+                de desenvolvimento são identificados como sintéticos.
               </p>
               <p>
-                Acesse pelo computador, tablet ou celular. Entre na sua conta
-                para retomar as sessões salvas e consultar seu histórico, sem
-                instalar um aplicativo.
+                Você pode explorar o sistema durante esta etapa. Ainda não
+                oferecemos um banco completo de provas oficiais.
               </p>
-              <div className={styles.accessTags}>
-                <span>Computador</span>
-                <span>Tablet</span>
-                <span>Celular</span>
-              </div>
-              <p className={styles.accessNote}>
-                Conexão com a internet necessária para sincronizar.
-              </p>
+              <Link href="/cadastro" className={styles.primaryButton}>
+                Explorar a versão atual{' '}
+                <ArrowRight size={18} aria-hidden="true" />
+              </Link>
             </div>
           </div>
         </section>
-
         <section
           id="duvidas"
           className={`${styles.container} ${styles.section} ${styles.faqSection}`}
           aria-labelledby="faq-title"
         >
-          <div>
-            <p className={styles.eyebrow}>05 / DÚVIDAS FREQUENTES</p>
+          <div data-reveal>
             <h2 id="faq-title">
-              Antes de
+              Dúvidas
               <br />
-              começar.
+              frequentes.
             </h2>
-            <p className={styles.faqIntro}>
-              O que você precisa saber sobre a plataforma e os seus resultados.
-            </p>
           </div>
           <div className={styles.faqList}>
             {faqs.map((faq) => (
@@ -463,20 +488,39 @@ export function LandingPage() {
             ))}
           </div>
         </section>
-
-        <section className={styles.finalCta} aria-labelledby="cta-title">
-          <div className={styles.container}>
-            <p className={styles.eyebrow}>O PRÓXIMO PASSO É SEU</p>
-            <h2 id="cta-title">
-              Dê uma direção
-              <br />à sua preparação.
-            </h2>
-            <Link href="/cadastro" className={styles.primaryButton}>
-              Criar minha conta <ArrowRight size={19} aria-hidden="true" />
-            </Link>
-            <p>
-              Já tem uma conta? <Link href="/entrar">Entre no seu espaço.</Link>
-            </p>
+        <section
+          id="contato"
+          className={styles.contactSection}
+          aria-labelledby="contact-title"
+        >
+          <div
+            className={`${styles.container} ${styles.contactGrid}`}
+            data-reveal
+          >
+            <div>
+              <p className={styles.eyebrow}>CONTATO</p>
+              <h2 id="contact-title">Converse com a gente.</h2>
+              <p>
+                Sugestões, dúvidas sobre a plataforma ou interesse em contribuir
+                com o acervo.
+              </p>
+            </div>
+            <div className={styles.contactAction}>
+              {contactEmail ? (
+                <a
+                  href={`mailto:${contactEmail}`}
+                  className={styles.contactLink}
+                >
+                  <Mail size={22} aria-hidden="true" />
+                  {contactEmail}
+                  <ArrowUpRight size={21} aria-hidden="true" />
+                </a>
+              ) : (
+                <p className={styles.contactPending}>
+                  Nosso canal de contato será divulgado aqui.
+                </p>
+              )}
+            </div>
           </div>
         </section>
       </main>
@@ -485,15 +529,16 @@ export function LandingPage() {
           <Link href="/" aria-label="BrasilPrep, início">
             <Brand />
           </Link>
-          <p>Preparação com critério.</p>
           <nav aria-label="Links do rodapé">
             <a href="#como-funciona">Como funciona</a>
+            <a href="#recursos">Recursos</a>
             <a href="#duvidas">Dúvidas frequentes</a>
-            <Link href="/entrar">Minha conta</Link>
+            <a href="#contato">Contato</a>
+            <Link href="/entrar">Entrar</Link>
           </nav>
         </div>
         <div className={`${styles.container} ${styles.footerBottom}`}>
-          <span>BrasilPrep · Plataforma em desenvolvimento</span>
+          <span>BrasilPrep · Em desenvolvimento</span>
           <span>Sem vínculo com instituições ou bancas examinadoras.</span>
         </div>
       </footer>
