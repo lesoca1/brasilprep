@@ -30,6 +30,7 @@ const icons = {
   settings: Settings2,
 };
 const publicPaths = [
+  '/',
   '/entrar',
   '/cadastro',
   '/confirmar',
@@ -60,6 +61,8 @@ export function AppShell({ children }: { children: ReactNode }) {
     )
       router.replace('/onboarding');
   }, [app.status, isPublic, needsOnboarding, onboarding, pathname, router]);
+  // The landing page must render even before auth resolves or without Supabase.
+  if (pathname === '/') return children;
   if (app.status === 'loading')
     return (
       <div className="auth-layout" role="status">
@@ -109,7 +112,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   if (isPublic)
     return (
       <div className="auth-layout">
-        <Link className="brand" href="/dashboard">
+        <Link className="brand" href="/">
           BrasilPrep
         </Link>
         {children}
