@@ -1,10 +1,10 @@
 # BrasilPrep engineering agreement
 
-Implement only the phase explicitly approved by the user. Phase 3 adds the editor-only question bank, taxonomy and validated bulk import on top of Phase 2. Stop after delivery and wait for approval before adding future phases.
+Implement only the phase explicitly approved by the user. Phase 4 adds persistent study/test practice sessions and basic results on top of Phase 3. Stop after delivery and wait for approval before adding future phases.
 
 - Preserve Next.js App Router, strict TypeScript, React and Tailwind.
 - Keep pages in src/app, reusable UI in src/components, feature screens in src/modules, synthetic fixtures in src/data and shared utilities in src/lib.
-- Keep database access, business rules, scoring and analytics out of UI. Scoring and analytics remain out of scope.
+- Keep database access, business rules, scoring and analytics out of UI. Official scoring and advanced analytics remain out of scope; basic practice accuracy is implemented and tested.
 - UI language is pt-BR. Do not use em dashes, gamification, invented official scores or fake benchmarks.
 - All demonstration metrics must remain visibly labeled. Never copy synthetic data into production pathways.
 - Only use provided, synthetic or licensed questions.

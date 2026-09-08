@@ -27,6 +27,10 @@ export type Database = {
     };
     Views: Record<string, never>;
     Functions: {
+      practice: {
+        Args: { action: string; payload: Record<string, unknown> };
+        Returns: unknown;
+      };
       import_questions: { Args: { batch: QuestionInput[] }; Returns: number };
       confirm_trilhas: { Args: { target_ids: string[] }; Returns: undefined };
       switch_trilha: { Args: { trilha_id: string }; Returns: undefined };

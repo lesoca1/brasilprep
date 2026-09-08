@@ -111,3 +111,7 @@ Referências: [Supabase Auth](https://supabase.com/docs/guides/auth), [RLS](http
 ## Fase 3: banco de questões
 
 Acervo editorial com importação JSON validada, taxonomia e identificação de conteúdo sintético. Veja [instalação e roteiro de revisão](docs/phase-3-review.md) e [decisões de arquitetura](docs/phase-3-architecture.md). Nenhum fluxo de prática foi implementado.
+
+## Fase 4: motor de prática
+
+Sessões persistentes em modos Estudo e Teste, filtros, sinalização, chute, cronômetro, retomada e resultados básicos. A migration da Fase 4 e o conteúdo sintético de desenvolvimento foram aplicados a lesoca1's Project. Veja [roteiro de demonstração e estado da validação](docs/phase-4-review.md) e [decisões de confiabilidade](docs/phase-4-architecture.md).
