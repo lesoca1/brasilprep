@@ -1,3 +1,4 @@
+import type { AnalyticsRepository } from './analytics';
 import type { PracticeRepository } from './practice';
 import type {
   QuestionInput,
@@ -33,6 +34,7 @@ export interface QuestionRepository {
   importBatch(questions: QuestionInput[]): Promise<number>;
 }
 export type AppServices = {
+  analytics: AnalyticsRepository;
   practice: PracticeRepository;
   auth: AuthGateway;
   workspace: WorkspaceRepository;

@@ -1,3 +1,8 @@
+import {
+  parseDataset,
+  totalAccuracy,
+  sessionAnswers,
+} from '../src/analytics/performance';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync } from 'node:fs';
@@ -49,6 +54,12 @@ test('complete study/test SQL loop: durable set, hidden feedback, retries, confl
       );
       return r.rows[0].v;
     }
+    async function analytics() {
+      const r = await db.query<{ v: unknown }>(
+        'select public.performance_answers() as v',
+      );
+      return parseDataset(r.rows[0].v);
+    }
     await as(alice);
     await db.query('select public.import_questions($1::jsonb)', [
       readFileSync('public/question-import.synthetic.json', 'utf8'),
@@ -80,6 +91,7 @@ test('complete study/test SQL loop: durable set, hidden feedback, retries, confl
       /insufficient_questions/,
     );
     let session = await api('start', config);
+    assert.equal((await analytics()).rows.length, 0);
     const ids = session.items.map((i) => i.question_id);
     assert.equal(session.items.length, 2);
     assert.ok(
@@ -145,6 +157,7 @@ test('complete study/test SQL loop: durable set, hidden feedback, retries, confl
       session.items.map((i) => i.question_id),
       ids,
     );
+    assert.equal((await analytics()).rows.length, 0);
     const sid = session.id;
     await as(bob);
     for (const action of ['read', 'save', 'submit'])
@@ -171,6 +184,22 @@ test('complete study/test SQL loop: durable set, hidden feedback, retries, confl
       revision: session.revision,
     };
     session = await api('submit', submit);
+    const persisted = await analytics();
+    assert.equal(persisted.rows.length, 2);
+    assert.deepEqual(
+      totalAccuracy(persisted.rows),
+      totalAccuracy(sessionAnswers(session)),
+    );
+    assert.equal(persisted.rows[0].spent_ms, 2500);
+    assert.equal(persisted.rows[1].selected, null);
+    assert.ok(
+      persisted.rows.every(
+        (r) => !('explanation' in r) && !('correct_answer' in r),
+      ),
+    );
+    await as(bob);
+    assert.equal((await analytics()).rows.length, 0);
+    await as(alice);
     const submittedAt = session.submitted_at;
     assert.ok(submittedAt);
     assert.ok(
@@ -206,6 +235,7 @@ test('complete study/test SQL loop: durable set, hidden feedback, retries, confl
       revision: 0,
     };
     session = await api('save', study);
+    assert.equal((await analytics()).rows.length, 2);
     assert.ok(session.items[0].question.explanation);
     assert.equal(session.items[1].question.explanation, undefined);
     await assert.rejects(
@@ -231,10 +261,37 @@ test('complete study/test SQL loop: durable set, hidden feedback, retries, confl
       operation_id: crypto.randomUUID(),
       revision: 1,
     });
+    assert.equal((await analytics()).rows.length, 4);
     await db.query('select public.remove_trilha($1)', [tid]);
+    assert.equal((await analytics()).rows.length, 4);
+    // More than PostgREST's usual row limit still travels as one complete JSON value.
+    await db.exec('reset role');
+    await db.query(
+      `with copies as (
+      insert into practice_private.sessions(id,user_id,exam_id,mode,kind,config,submitted_at)
+      select gen_random_uuid(),user_id,exam_id,mode,kind,config,submitted_at
+      from practice_private.sessions cross join generate_series(1,501) where id=$1 returning id
+    ) insert into practice_private.items(session_id,position,question_id,snapshot,selected,correct,spent_ms,answered_at)
+      select copies.id,i.position,i.question_id,i.snapshot,i.selected,i.correct,i.spent_ms,i.answered_at
+      from copies cross join practice_private.items i where i.session_id=$1`,
+      [sid],
+    );
+    await as(alice);
+    const large = await analytics();
+    assert.equal(large.rows.length, 1006);
+    assert.equal(
+      totalAccuracy(large.rows.filter((r) => r.mode === 'test')).total,
+      1004,
+    );
+    await as(bob);
+    assert.equal((await analytics()).rows.length, 0);
+    await as(alice);
     assert.equal((await api('read', { session_id: sid })).trilha_id, null);
     await db.exec('reset role;set role anon');
     await assert.rejects(api('read', { session_id: sid }), /permission denied/);
+    await assert.rejects(analytics(), /permission denied/);
+    await as('');
+    await assert.rejects(analytics(), /unauthenticated/);
   } finally {
     await db.close();
   }
