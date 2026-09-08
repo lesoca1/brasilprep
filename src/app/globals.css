@@ -1329,3 +1329,116 @@ tr:last-child td {
     grid-template-columns: 1fr;
   }
 }
+
+.practice-form {
+  padding: 1.25rem;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.25rem;
+}
+.practice-form label {
+  display: grid;
+  gap: 0.5rem;
+  min-width: 0;
+}
+.practice-wide {
+  grid-column: 1/-1;
+  display: grid;
+  gap: 1rem;
+  justify-items: start;
+}
+.practice-toolbar,
+.practice-session-row {
+  padding: 1.25rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+.practice-toolbar label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.practice-toolbar input[type='checkbox'] {
+  width: 1rem;
+  height: 1rem;
+}
+.practice-pad {
+  padding: 1rem 1.25rem;
+}
+.practice-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 1.25rem 1.25rem 0;
+}
+.practice-nav [aria-current='step'] {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+.practice-alternatives {
+  border: 0;
+  display: grid;
+  gap: 0.65rem;
+  padding: 0;
+  min-width: 0;
+}
+.practice-alternatives legend {
+  margin-bottom: 0.75rem;
+}
+.practice-alternative {
+  display: flex;
+  gap: 1rem;
+  text-align: left;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1rem;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  overflow-wrap: anywhere;
+}
+.practice-alternative.selected {
+  border-color: currentColor;
+  box-shadow: inset 3px 0 currentColor;
+}
+.practice-alternative:disabled {
+  cursor: default;
+}
+.practice-alternative:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+}
+.practice-feedback,
+.practice-confirm,
+.practice-notice {
+  padding: 1.25rem;
+  border: 1px solid var(--border);
+  display: grid;
+  gap: 1rem;
+}
+.practice-notice {
+  margin-bottom: 1.25rem;
+}
+.practice-results {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+  padding: 1.25rem;
+}
+.practice-results strong {
+  display: block;
+  font-size: 1.75rem;
+}
+@media (max-width: 700px) {
+  .practice-form {
+    grid-template-columns: 1fr;
+  }
+  .practice-results {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

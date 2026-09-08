@@ -1,3 +1,4 @@
+import { createPracticeRepository } from './practice';
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import type { Database } from './database.types';
 import type { AppServices } from './contracts';
@@ -43,6 +44,7 @@ function check(error: { message: string; code?: string } | null) {
 }
 export function createServices(client: SupabaseClient<Database>): AppServices {
   return {
+    practice: createPracticeRepository(client),
     questions: {
       async isEditor() {
         const result = await client
