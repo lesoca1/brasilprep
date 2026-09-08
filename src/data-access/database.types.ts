@@ -27,6 +27,7 @@ export type Database = {
     };
     Views: Record<string, never>;
     Functions: {
+      performance_answers: { Args: Record<string, never>; Returns: unknown };
       practice: {
         Args: { action: string; payload: Record<string, unknown> };
         Returns: unknown;

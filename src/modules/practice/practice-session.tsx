@@ -1,4 +1,5 @@
 'use client';
+import { SessionAnalytics } from '@/modules/performance/metric-report';
 import { useEffect, useRef, useState } from 'react';
 import { Button, Panel } from '@/components/ui/primitives';
 import {
@@ -185,30 +186,7 @@ export function PracticeSessionView({
         {storageError && <p role="alert">{storageError}</p>}
         {closed ? (
           <>
-            <div className="practice-results">
-              <p>
-                <strong>{result.correct}</strong> corretas
-              </p>
-              <p>
-                <strong>{result.incorrect}</strong> incorretas
-              </p>
-              <p>
-                <strong>{result.blank}</strong> em branco
-              </p>
-              <p>
-                <strong>
-                  {result.accuracy.toLocaleString('pt-BR', {
-                    maximumFractionDigits: 1,
-                  })}
-                  %
-                </strong>{' '}
-                de acerto sobre {result.total} questões
-              </p>
-            </div>
-            <p className="data-note">
-              Este resultado descreve apenas esta sessão. Não equivale à nota
-              oficial do vestibular.
-            </p>
+            <SessionAnalytics session={session} />
             {session.items.map((i) => (
               <details className="question-record" key={i.position}>
                 <summary>
