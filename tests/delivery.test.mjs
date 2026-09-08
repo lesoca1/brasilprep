@@ -47,7 +47,11 @@ test('public landing renders before authentication and links to real routes', ()
     assert.ok(html.includes(`href="${route}"`), route);
     assert.ok(existsSync(`out${route}index.html`));
   }
-  for (const asset of ['hero-green.jpg', 'highlight.png']) {
+  for (const asset of [
+    'hero-green.jpg',
+    'highlight.png',
+    'platform-illustration.png',
+  ]) {
     assert.ok(existsSync(`out/landing/${asset}`));
   }
 });
